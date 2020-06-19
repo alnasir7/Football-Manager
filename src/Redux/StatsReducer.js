@@ -12,10 +12,10 @@ export default function (state = initialState, { type, payload }) {
     case updateTeam:
       const { id, prop, propData } = payload;
       const newTeam = {
-        ...[...state].filter((item, index) => index === id)[0],
+        ...[...state].filter((item) => item.id === id)[0],
       };
       newTeam[prop] = propData;
-      return state.map((item, index) => (index === id ? newTeam : item));
+      return state.map((item) => (item.id === id ? newTeam : item));
 
       break;
 

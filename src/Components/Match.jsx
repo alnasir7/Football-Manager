@@ -5,24 +5,37 @@ import match from "../Engine/Match";
 import { result } from "lodash";
 import { type } from "jquery";
 
-const Match = ({ homeTeam, awayTeam, matchPlayed }) => {
+const Match = ({ teams, scores, round, index, played }) => {
+  const homeTeam = teams[0];
+  const awayTeam = teams[1];
   const dispatch = useDispatch();
-  const home = useSelector((store) => store.statsReducer)[homeTeam];
-  const away = useSelector((store) => store.statsReducer)[awayTeam];
+  const home = useSelector((store) => store.statsReducer).filter(
+    (team) => team.id === homeTeam
+  )[0];
+  const away = useSelector((store) => store.statsReducer).filter(
+    (team) => team.id === awayTeam
+  )[0];
+  const schedule = useSelector((store) => store.scheduleReducer.schedule);
+  console.log(played);
 
   const [result, changeResult] = useState(null);
 
   useEffect(() => {
-    if (matchPlayed) {
+    if (played) {
       const response = match(home, away);
+      console.log("but why");
       matchCalculations(response);
       changeResult(response);
     } else {
       changeResult(null);
     }
-  }, [matchPlayed]);
+  }, [played]);
 
   const matchCalculations = ({ homeScore, awayScore }) => {
+    const newSchedue = [...schedule];
+    newSchedue[round][index].result = { homeScore, awayScore };
+    dispatch({ type: "updateSchedule", payload: newSchedue });
+
     var newHomePoints = 0;
     var newAwayPoints = 0;
     if (homeScore > awayScore) {
@@ -47,6 +60,23 @@ const Match = ({ homeTeam, awayTeam, matchPlayed }) => {
       if (away.points) newAwayPoints = away.points + 3;
       else newAwayPoints = 3;
     }
+
+    var newHomeGoalsFor = 0;
+    var newAwayGoalsFor = 0;
+    var newHomeGoalsAgainst = 0;
+    var newAwayGoalsAgainst = 0;
+    if (home.goalsFor) newHomeGoalsFor = home.goalsFor + homeScore;
+    else newHomeGoalsFor = homeScore;
+
+    if (home.goalsAgainst) newHomeGoalsAgainst = home.goalsAgainst + awayScore;
+    else newHomeGoalsAgainst = awayScore;
+
+    if (away.goalsFor) newAwayGoalsFor = away.goalsFor + awayScore;
+    else newAwayGoalsFor = awayScore;
+
+    if (away.goalsAgainst) newAwayGoalsAgainst = away.goalsAgainst + homeScore;
+    else newAwayGoalsAgainst = homeScore;
+
     dispatch({
       type: "updateTeam",
       payload: { id: homeTeam, prop: "points", propData: newHomePoints },
@@ -54,6 +84,30 @@ const Match = ({ homeTeam, awayTeam, matchPlayed }) => {
     dispatch({
       type: "updateTeam",
       payload: { id: awayTeam, prop: "points", propData: newAwayPoints },
+    });
+    dispatch({
+      type: "updateTeam",
+      payload: { id: homeTeam, prop: "goalsFor", propData: newHomeGoalsFor },
+    });
+    dispatch({
+      type: "updateTeam",
+      payload: {
+        id: homeTeam,
+        prop: "goalsAgainst",
+        propData: newHomeGoalsAgainst,
+      },
+    });
+    dispatch({
+      type: "updateTeam",
+      payload: { id: awayTeam, prop: "goalsFor", propData: newAwayGoalsFor },
+    });
+    dispatch({
+      type: "updateTeam",
+      payload: {
+        id: awayTeam,
+        prop: "goalsAgainst",
+        propData: newAwayGoalsAgainst,
+      },
     });
   };
 

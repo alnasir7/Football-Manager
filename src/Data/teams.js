@@ -24,20 +24,23 @@ const liverpool = {
   attack: 5,
   deffense: 5,
   logo: liverpoolIcon,
+  id: 0,
 };
 
 const chelsea = {
   name: "Chelsea",
   attack: 4,
-  deffense: 4,
+  deffense: 3,
   logo: chelseaIcon,
+  id: 1,
 };
 
 const united = {
   name: "Manchester UTD",
-  attack: 4,
+  attack: 3,
   deffense: 3,
   logo: unitedIcon,
+  id: 2,
 };
 
 const city = {
@@ -45,27 +48,31 @@ const city = {
   attack: 5,
   deffense: 4,
   logo: cityIcon,
+  id: 3,
 };
 
 const totenham = {
   name: "Totenham",
   attack: 4,
-  deffense: 4,
+  deffense: 3,
   logo: tottenhamIcon,
+  id: 4,
 };
 
 const arsenal = {
   name: "Arsenal",
-  attack: 4,
+  attack: 3,
   deffense: 3,
   logo: arsenalIcon,
+  id: 5,
 };
 
 const wolves = {
   name: "Wolverhampton",
   attack: 3,
-  deffense: 3,
+  deffense: 2,
   logo: wolvesIcon,
+  id: 6,
 };
 
 const sheffield = {
@@ -73,20 +80,23 @@ const sheffield = {
   attack: 2,
   deffense: 3,
   logo: sheffieldIcon,
+  id: 7,
 };
 
 const leciester = {
   name: "Lecister City",
-  attack: 4,
+  attack: 3,
   deffense: 3,
   logo: leciesterIcon,
+  id: 8,
 };
 
 const Everton = {
   name: "Everton",
-  attack: 3,
+  attack: 2,
   deffense: 2,
   logo: evertonIcon,
+  id: 9,
 };
 
 const westham = {
@@ -94,6 +104,7 @@ const westham = {
   attack: 2,
   deffense: 2,
   logo: westhamIcon,
+  id: 10,
 };
 
 const burnely = {
@@ -101,6 +112,7 @@ const burnely = {
   attack: 2,
   deffense: 2,
   logo: burnelyIcon,
+  id: 11,
 };
 
 const newcastle = {
@@ -108,6 +120,7 @@ const newcastle = {
   attack: 2,
   deffense: 1,
   logo: newcastleIcon,
+  id: 12,
 };
 
 const crystal = {
@@ -115,6 +128,7 @@ const crystal = {
   attack: 1,
   deffense: 2,
   logo: crystalIcon,
+  id: 13,
 };
 
 const brighton = {
@@ -122,6 +136,7 @@ const brighton = {
   attack: 1,
   deffense: 1,
   logo: brightonIcon,
+  id: 14,
 };
 
 const southampton = {
@@ -129,6 +144,7 @@ const southampton = {
   attack: 1,
   deffense: 2,
   logo: southamptonIcon,
+  id: 15,
 };
 
 const watford = {
@@ -136,6 +152,7 @@ const watford = {
   attack: 2,
   deffense: 1,
   logo: watfordIcon,
+  id: 16,
 };
 
 const astonVilla = {
@@ -143,6 +160,7 @@ const astonVilla = {
   attack: 1,
   deffense: 1,
   logo: astonVillaIcon,
+  id: 17,
 };
 
 const norwich = {
@@ -150,6 +168,7 @@ const norwich = {
   attack: 1,
   deffense: 1,
   logo: norwichIcon,
+  id: 18,
 };
 
 const bournemouth = {
@@ -157,6 +176,7 @@ const bournemouth = {
   attack: 1,
   deffense: 1,
   logo: bournemouthIcon,
+  id: 19,
 };
 
 const teams = [

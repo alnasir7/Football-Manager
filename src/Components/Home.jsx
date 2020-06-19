@@ -5,7 +5,7 @@ import Table from "./table";
 const Home = () => {
   return (
     <div>
-      <div className="container" style={{ paddingTop: "50px", margin: "10px" }}>
+      <div className="container" style={{ paddingTop: "20px", margin: "5px" }}>
         <div className="row">
           <div className="col col-8">
             <Fixtures />
@@ -14,7 +14,7 @@ const Home = () => {
             className="col col-4"
             style={{ maxHeight: "75vh", overflow: "scroll" }}
           >
-            <Table />
+            <Table miniDisplay={true} />
           </div>
         </div>
       </div>

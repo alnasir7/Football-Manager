@@ -9,8 +9,9 @@ const Fixtures = () => {
   const round = useSelector((store) => store.scheduleReducer.round);
   const [matchPlayed, changeMatchPayed] = useState(false);
 
+  console.log(schedule);
   const proceed = () => {
-    if (matchPlayed) {
+    if (schedule[round][0].result) {
       dispatch({ type: "changeRound", payload: round + 1 });
       changeMatchPayed(false);
     } else changeMatchPayed(true);
@@ -18,19 +19,24 @@ const Fixtures = () => {
 
   return (
     <div style={{ textAlign: "center", background: "#f1f1f1" }}>
-      <div style={{ textAlign: "center", margin: "3%" }}>
+      <div style={{ textAlign: "center", margin: "2%" }}>
         <h4>Round {round + 1}</h4>
       </div>
-      <div style={{ margin: "0px 25%", paddingTop: "5%" }}>
-        {schedule[round].map((element) => (
-          <div>
-            <Match
-              homeTeam={element[0]}
-              awayTeam={element[1]}
-              matchPlayed={matchPlayed}
-            />
-          </div>
-        ))}
+      <div style={{ margin: "0px 25%", paddingTop: "2%" }}>
+        {schedule[round].map((element, index) => {
+          console.log(element.teams);
+          return (
+            <div>
+              <Match
+                teams={element.teams}
+                scores={element.result}
+                index={index}
+                round={round}
+                played={matchPlayed}
+              />
+            </div>
+          );
+        })}
       </div>
       <button
         className="btn btn-primary"

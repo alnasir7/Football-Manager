@@ -45,34 +45,38 @@ const generateSchedule = () => {
     const games = getFrom(startingPoints[i]);
 
     games.forEach((item, index) => {
-      if (index >= i) schedule[item].push([index, i]);
+      if (index >= i) schedule[item].push({ teams: [index, i] });
     });
   }
+
   const finalSchedule = schedule.map(fixRound);
   const returnedSchedule = randomize(finalSchedule);
   returnedSchedule.forEach((round) => {
     const reversedRound = [];
 
     round.forEach((item) => {
-      reversedRound.push([item[1], item[0]]);
+      reversedRound.push({ teams: [item.teams[1], item.teams[0]] });
     });
 
     returnedSchedule.push(reversedRound);
   });
-  console.log(returnedSchedule);
 
+  console.log(returnedSchedule);
   return returnedSchedule;
 };
 
 const randomize = (schedule) => {
-  const schedule1 = [...schedule.sort((a, b) => 0.5 - Math.random())];
-  const schedule2 = [
-    ...schedule1.map((round) => round.sort((a, b) => 0.5 - Math.random())),
-  ];
+  const schedule1 = schedule.sort((a, b) => 0.5 - Math.random());
+
+  const schedule2 = schedule1.map((round) =>
+    round.sort((a, b) => 0.5 - Math.random())
+  );
 
   const schedule3 = [
     ...schedule2.map((round, index) =>
-      round.map((match) => match.sort((a, b) => 0.5 - Math.random()))
+      round.map((match) => {
+        return { teams: match.teams.sort((a, b) => 0.5 - Math.random()) };
+      })
     ),
   ];
 
@@ -81,9 +85,10 @@ const randomize = (schedule) => {
 
 const fixRound = (round) => {
   const newRound = round.map((item) => {
-    if (item[0] === item[1]) return [item[0], 19];
+    if (item.teams[0] === item.teams[1]) return { teams: [item.teams[0], 19] };
     else return item;
   });
+
   return newRound;
 };
 
