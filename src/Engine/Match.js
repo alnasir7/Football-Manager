@@ -1,9 +1,14 @@
-export default function match(home, away) {
+import getGoals from "./goalScoring";
+import NormalDistribution from "normal-distribution";
+
+export default function matchGenerate(home, away) {
+  //finding weights
   const homeGoals = generate(findWeights("attack", home.attack + 1));
   const homeDefense = generate(findWeights("deffense", home.deffense + 1));
   const awayGoals = generate(findWeights("attack", away.attack));
   const awayDefense = generate(findWeights("deffense", away.deffense));
 
+  //gettign the final score from attack and defense scores
   var homeScore = homeGoals - awayDefense;
   if (homeScore < 0) {
     homeScore = 0;
@@ -13,81 +18,77 @@ export default function match(home, away) {
     awayScore = 0;
   }
 
-  if (homeScore + awayScore < 3) {
+  // fixing weird results
+  if (homeScore + awayScore >= 4) {
     var x = Math.random();
-    if (x < 0.35) {
+    if (x < 0.7) {
+      homeScore--;
+      awayScore--;
+      if (awayScore < 0) awayScore = 0;
+      if (homeScore < 0) homeScore = 0;
+    }
+  }
+
+  if (homeScore + awayScore <= 1) {
+    var x = Math.random();
+    if (x < 0.7) {
       homeScore++;
       awayScore++;
     }
   }
 
-  if (homeScore + awayScore > 6) {
+  if (homeScore - awayScore > 2) {
     var x = Math.random();
-    if (x < 0.3) {
+    if (x < 0.2 * away.deffense) {
       homeScore--;
+    }
+    if (x < 0.15 * away.deffense) {
+      homeScore--;
+    }
+  }
+  if (awayScore - homeScore > 2) {
+    var x = Math.random();
+    if (x < 0.2 * home.deffense) {
       awayScore--;
-      if (awayScore < 0) awayScore = 0;
+    }
+    if (x < 0.15 * home.deffense) {
+      awayScore--;
     }
   }
 
-  return { homeScore, awayScore };
+  //getting the scorers of the goals for teams with valid players
+
+  const goalScorersHome = [];
+  if (home.players) {
+    for (let i = 0; i < homeScore; i++)
+      goalScorersHome.push(getGoals(home.players));
+  }
+  const goalScorersAway = [];
+  if (away.players) {
+    for (let i = 0; i < awayScore; i++)
+      goalScorersAway.push(getGoals(away.players));
+  }
+
+  if (homeScore < 0) homeScore = 0;
+  if (awayScore < 0) awayScore = 0;
+  return { homeScore, awayScore, goalScorersAway, goalScorersHome };
 }
 
 const findWeights = (mode, level) => {
-  var weights;
+  //randomizing an attack score for each team based on drawing a sample from a normal distribution where the mean is a function of the teams fixed attack level
   if (mode === "attack") {
-    switch (level) {
-      case 1:
-        weights = { 0: 4, 1: 20, 2: 28, 3: 12, 4: 0, 5: 0, 6: 0, 7: 0 };
-        break;
-
-      case 2:
-        weights = { 0: 2, 1: 15, 2: 39, 3: 14, 4: 2, 5: 0, 6: 0, 7: 0 };
-        break;
-
-      case 3:
-        weights = { 0: 2, 1: 14, 2: 37, 3: 26, 4: 5, 5: 1 };
-        break;
-
-      case 4:
-        weights = { 0: 2, 1: 6, 2: 29, 3: 33, 4: 15, 5: 2, 6: 1 };
-        break;
-
-      case 5:
-        weights = { 0: 1, 1: 2, 2: 14, 3: 28, 4: 28, 5: 12, 6: 2 };
-        break;
-
-      case 6:
-        weights = { 0: 0, 1: 1, 2: 5, 3: 28, 4: 33, 5: 16, 6: 1, 7: 1 };
-        break;
+    const normDist = new NormalDistribution(level - 1.2, 1.4);
+    var weights = {};
+    for (var i = 0; i <= 7; i++) {
+      weights[i] = Math.round(50 * normDist.pdf(i));
     }
   }
-
+  //randomizing an deffense score for each team based on drawing a sample from a normal distribution where the mean is a function of the teams fixed deffense level
   if (mode === "deffense") {
-    switch (level) {
-      case 1:
-        weights = { 0: 12, 1: 25, 2: 12, 3: 1 };
-        break;
-
-      case 2:
-        weights = { 0: 9, 1: 28, 2: 12, 3: 3, 4: 1 };
-        break;
-
-      case 3:
-        weights = { 0: 6, 1: 18, 2: 18, 3: 8, 4: 3 };
-        break;
-
-      case 4:
-        weights = { 0: 4, 1: 12, 2: 20, 3: 15, 4: 6, 5: 1 };
-        break;
-
-      case 5:
-        weights = { 0: 0, 1: 10, 2: 19, 3: 18, 4: 9, 5: 3 };
-        break;
-
-      case 6:
-        weights = { 0: 0, 1: 5, 2: 12, 3: 25, 4: 11, 5: 4 };
-        break;
+    const normDist = new NormalDistribution(level - 1.5, 1.4);
+    var weights = {};
+    for (var i = 0; i <= 7; i++) {
+      weights[i] = Math.round(50 * normDist.pdf(i));
     }
   }
 
@@ -95,6 +96,7 @@ const findWeights = (mode, level) => {
 };
 
 const generate = (weights) => {
+  //generates a random number from a group of weigthed numbers, where the weight determines the probability of the number being selected
   var i,
     sum = 0,
     total = 0;
@@ -112,6 +114,7 @@ const generate = (weights) => {
 };
 
 function getRandomInt(min, max) {
+  //generates a random number within a defined interval
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;

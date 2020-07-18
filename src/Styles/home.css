@@ -1,0 +1,9 @@
+.home {
+  padding-top: 20px;
+  margin: 5px;
+}
+
+.home-table {
+  max-height: 75vh;
+  overflow: scroll;
+}

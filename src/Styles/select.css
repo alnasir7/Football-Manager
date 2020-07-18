@@ -1,0 +1,14 @@
+.select-container {
+  margin: 100px auto;
+  text-align: center;
+}
+
+.leagues {
+  text-align: start;
+  padding: 2%;
+}
+
+.advance {
+  display: flex;
+  align-content: flex-end;
+}

@@ -1,135 +1,141 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import teams from "../Data/teams";
-import match from "../Engine/Match";
-import { result } from "lodash";
-import { type } from "jquery";
+import matchGenerate from "../Engine/Match";
+import calculateLeagueChanges from "../Engine/leagueCalculations";
 
-const Match = ({ teams, scores, round, index, played }) => {
+const Match = ({ match, round, index, played }) => {
+  const dispatch = useDispatch();
+  //defining the constants of the mathc
+  const ids = useSelector((store) => store.idReducer);
+  const { teams, result: score, scorers } = match;
   const homeTeam = teams[0];
   const awayTeam = teams[1];
-  const dispatch = useDispatch();
   const home = useSelector((store) => store.statsReducer).filter(
-    (team) => team.id === homeTeam
+    (team) => team.id === ids[homeTeam]
   )[0];
   const away = useSelector((store) => store.statsReducer).filter(
-    (team) => team.id === awayTeam
+    (team) => team.id === ids[awayTeam]
   )[0];
   const schedule = useSelector((store) => store.scheduleReducer.schedule);
-  console.log(played);
+  //setting max goals to know how many lines in the goal scoreres section
+  var maxGoals;
+  if (scorers)
+    maxGoals =
+      scorers.goalScorersHome.length >= scorers.goalScorersAway.length
+        ? "home"
+        : "away";
 
-  const [result, changeResult] = useState(null);
+  //Setting the result
+  const [result, changeResult] = useState();
 
   useEffect(() => {
+    //determining the result of the match
     if (played) {
-      const response = match(home, away);
-      console.log("but why");
+      const response = matchGenerate(home, away);
       matchCalculations(response);
       changeResult(response);
     } else {
-      changeResult(null);
+      changeResult(
+        score
+          ? { homeScore: score.homeScore, awayScore: score.awayScore }
+          : null
+      );
     }
-  }, [played]);
+  }, [played, round]);
 
-  const matchCalculations = ({ homeScore, awayScore }) => {
-    const newSchedue = [...schedule];
-    newSchedue[round][index].result = { homeScore, awayScore };
-    dispatch({ type: "updateSchedule", payload: newSchedue });
+  const matchCalculations = ({
+    homeScore,
+    awayScore,
+    goalScorersHome,
+    goalScorersAway,
+  }) => {
+    //defining Objects
+    const newSchedule = [...schedule];
+    newSchedule[round][index].result = { homeScore, awayScore };
+    newSchedule[round][index].scorers = { goalScorersHome, goalScorersAway };
+    dispatch({ type: "updateSchedule", payload: newSchedule });
 
-    var newHomePoints = 0;
-    var newAwayPoints = 0;
-    if (homeScore > awayScore) {
-      if (home.points) newHomePoints = home.points + 3;
-      else newHomePoints = 3;
+    const returnedTeams = calculateLeagueChanges(
+      home,
+      away,
+      homeScore,
+      awayScore,
+      goalScorersHome,
+      goalScorersAway
+    );
 
-      if (away.points) newAwayPoints = away.points;
-      else newAwayPoints = 0;
-    }
-
-    if (homeScore === awayScore) {
-      if (home.points) newHomePoints = home.points + 1;
-      else newHomePoints = 1;
-
-      if (away.points) newAwayPoints = away.points + 1;
-      else newAwayPoints = 1;
-    }
-    if (awayScore > homeScore) {
-      if (home.points) newHomePoints = home.points;
-      else newHomePoints = 0;
-
-      if (away.points) newAwayPoints = away.points + 3;
-      else newAwayPoints = 3;
-    }
-
-    var newHomeGoalsFor = 0;
-    var newAwayGoalsFor = 0;
-    var newHomeGoalsAgainst = 0;
-    var newAwayGoalsAgainst = 0;
-    if (home.goalsFor) newHomeGoalsFor = home.goalsFor + homeScore;
-    else newHomeGoalsFor = homeScore;
-
-    if (home.goalsAgainst) newHomeGoalsAgainst = home.goalsAgainst + awayScore;
-    else newHomeGoalsAgainst = awayScore;
-
-    if (away.goalsFor) newAwayGoalsFor = away.goalsFor + awayScore;
-    else newAwayGoalsFor = awayScore;
-
-    if (away.goalsAgainst) newAwayGoalsAgainst = away.goalsAgainst + homeScore;
-    else newAwayGoalsAgainst = homeScore;
+    const newHome = returnedTeams.home;
+    const newAway = returnedTeams.away;
 
     dispatch({
-      type: "updateTeam",
-      payload: { id: homeTeam, prop: "points", propData: newHomePoints },
+      type: "replaceTeam",
+      payload: { id: ids[homeTeam], newTeam: newHome },
     });
     dispatch({
-      type: "updateTeam",
-      payload: { id: awayTeam, prop: "points", propData: newAwayPoints },
-    });
-    dispatch({
-      type: "updateTeam",
-      payload: { id: homeTeam, prop: "goalsFor", propData: newHomeGoalsFor },
-    });
-    dispatch({
-      type: "updateTeam",
-      payload: {
-        id: homeTeam,
-        prop: "goalsAgainst",
-        propData: newHomeGoalsAgainst,
-      },
-    });
-    dispatch({
-      type: "updateTeam",
-      payload: { id: awayTeam, prop: "goalsFor", propData: newAwayGoalsFor },
-    });
-    dispatch({
-      type: "updateTeam",
-      payload: {
-        id: awayTeam,
-        prop: "goalsAgainst",
-        propData: newAwayGoalsAgainst,
-      },
+      type: "replaceTeam",
+      payload: { id: ids[awayTeam], newTeam: newAway },
     });
   };
 
   return (
     <div>
-      <div
-        className="container"
-        style={{ display: "flex", justifyContent: "space-between" }}
-      >
-        <div className="flexItem">
-          <img src={home.logo} alt={home.name} />
-        </div>
-        {result ? (
-          <div className="flexItem">
-            {result.homeScore} : {result.awayScore}
+      {home ? (
+        <div>
+          <div className="container flex-container">
+            <div className="flexItem">
+              <img src={home.logo} alt={home.name} />
+            </div>
+            {result ? (
+              <div className="flexItem">
+                {result.homeScore} : {result.awayScore}
+              </div>
+            ) : null}
+            <div className="flexItem">
+              <img src={away.logo} alt={away.name} />
+            </div>
           </div>
-        ) : null}
-        <div className="flexItem">
-          <img src={away.logo} alt={away.name} />
+
+          <div className="mt-2">
+            {scorers
+              ? maxGoals === "home"
+                ? scorers.goalScorersHome.map((element, index) => {
+                    return (
+                      <div className="container flex-container">
+                        <div className="flexItem">
+                          {scorers.goalScorersHome[index]
+                            ? scorers.goalScorersHome[index].name
+                            : ""}
+                        </div>
+                        <div className="flexItem">
+                          {scorers.goalScorersAway[index]
+                            ? scorers.goalScorersAway[index].name
+                            : ""}
+                        </div>
+                      </div>
+                    );
+                  })
+                : scorers.goalScorersAway.map((element, index) => {
+                    return (
+                      <div className="container flex-container">
+                        <div className="flexItem">
+                          {scorers.goalScorersHome[index]
+                            ? scorers.goalScorersHome[index].name
+                            : ""}
+                        </div>
+                        <div className="flexItem">
+                          {scorers.goalScorersAway[index]
+                            ? scorers.goalScorersAway[index].name
+                            : ""}
+                        </div>
+                      </div>
+                    );
+                  })
+              : null}
+          </div>
+
+          <hr />
         </div>
-      </div>
-      <hr />
+      ) : null}
     </div>
   );
 };

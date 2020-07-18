@@ -7,6 +7,13 @@ import teams from "./Data/teams";
 import { Provider } from "react-redux";
 import store from "./Redux/store";
 import "./App.css";
+import "./Styles/fixtures.css";
+import "./Styles/home.css";
+import "./Styles/match.css";
+import "./Styles/navbar.css";
+import "./Styles/select.css";
+import "./Styles/table.css";
+
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 
 function App() {

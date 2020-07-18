@@ -1,0 +1,13 @@
+.navbar-custom {
+  z-index: 2;
+  padding: 10px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 0px;
+  padding: 10px;
+  height: 80px;
+  font-size: 26px;
+}

@@ -1,25 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 const Navbar = () => {
+  const teams = useSelector((store) => store.statsReducer);
+  const teamsHaveBeenSelected = teams.length;
+
   return (
-    <nav
-      className="navbar navbar-dark bg-dark"
-      style={{ width: "100vw", zIndex: "2", padding: "0px" }}
-    >
+    <nav className="navbar navbar-dark bg-dark navbar-custom">
       <div
-        className="container"
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          margin: "0px",
-          padding: "10px",
-          height: "80px",
-          fontSize: "26px",
-          minWidth: "100vw",
-        }}
+        className="container nav-container"
+        style={{ display: teamsHaveBeenSelected ? "" : "none" }}
       >
         <div className="flexItem">
-          <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+          <Link
+            to="/home"
+            style={{
+              textDecoration: "none",
+              color: "white",
+            }}
+          >
             <h3>Home</h3>
           </Link>
         </div>
@@ -27,7 +26,10 @@ const Navbar = () => {
         <div className="flexItem">
           <Link
             to="/Fixtures"
-            style={{ textDecoration: "none", color: "white" }}
+            style={{
+              textDecoration: "none",
+              color: "white",
+            }}
           >
             <h3>Fixtures</h3>
           </Link>
@@ -40,9 +42,22 @@ const Navbar = () => {
         </div>
 
         <div className="flexItem">
-          <Link to="/home" style={{ textDecoration: "none", color: "white" }}>
+          <Link
+            to="/goalscorers"
+            style={{ textDecoration: "none", color: "white" }}
+          >
             <h3>Top Scorers</h3>
           </Link>
+        </div>
+        <div className="flexItem">
+          <h3
+            style={{ color: "white", cursor: "pointer" }}
+            onClick={() => {
+              window.location = "/";
+            }}
+          >
+            Restart
+          </h3>
         </div>
       </div>
     </nav>

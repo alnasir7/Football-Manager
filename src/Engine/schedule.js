@@ -61,7 +61,6 @@ const generateSchedule = () => {
     returnedSchedule.push(reversedRound);
   });
 
-  console.log(returnedSchedule);
   return returnedSchedule;
 };
 

@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Match from "./Match";
-import Table from "./table";
-import Navbar from "./Navbar";
-const Fixtures = () => {
+
+const Fixtures = (props) => {
+  //return to home screen if the component was incorrectly accessed before initializing teams
+  const initialTeams = useSelector((store) => store.statsReducer);
+  if (!initialTeams.length) {
+    props.history.push("./");
+  }
+  //
   const dispatch = useDispatch();
   const schedule = useSelector((store) => store.scheduleReducer.schedule);
   const round = useSelector((store) => store.scheduleReducer.round);
   const [matchPlayed, changeMatchPayed] = useState(false);
 
-  console.log(schedule);
   const proceed = () => {
     if (schedule[round][0].result) {
       dispatch({ type: "changeRound", payload: round + 1 });
@@ -18,38 +22,33 @@ const Fixtures = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", background: "#f1f1f1" }}>
-      <div style={{ textAlign: "center", margin: "2%" }}>
-        <h4>Round {round + 1}</h4>
-      </div>
-      <div style={{ margin: "0px 25%", paddingTop: "2%" }}>
-        {schedule[round].map((element, index) => {
-          console.log(element.teams);
-          return (
-            <div>
-              <Match
-                teams={element.teams}
-                scores={element.result}
-                index={index}
-                round={round}
-                played={matchPlayed}
-              />
-            </div>
-          );
-        })}
-      </div>
+    <div className="fixtures">
       <button
-        className="btn btn-primary"
+        className="btn btn-primary procced-button"
+        disabled={round >= 37 && matchPlayed}
         onClick={proceed}
-        style={{
-          marginTop: "8px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginBottom: "40px",
-        }}
       >
         Procced
       </button>
+      <div style={{ textAlign: "center", margin: "2%" }}>
+        <h4>Round {round + 1}</h4>
+      </div>
+      <div className="fixtures-body">
+        {schedule[round]
+          ? schedule[round].map((element, index) => {
+              return (
+                <div>
+                  <Match
+                    match={element}
+                    index={index}
+                    round={round}
+                    played={matchPlayed}
+                  />
+                </div>
+              );
+            })
+          : null}
+      </div>
     </div>
   );
 };
